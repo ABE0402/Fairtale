@@ -417,10 +417,16 @@ async def index():
 
                 <!-- STEP 3: Results -->
                 <div id="results-area" class="step-card" style="display:none">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                        <h2 class="step-title">✨ 변환 결과 (1024px HQ)</h2>
-                        <button class="btn-download" onclick="location.href='/api/download-zip'">📦 전체 ZIP 다운로드</button>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:12px;">
+                        <h2 class="step-title">✨ 편집 결과 (1024px HQ)</h2>
+                        <div style="display:flex; gap:12px;">
+                            <button class="btn-download" onclick="downloadScript()">📝 수정된 대본 저장</button>
+                            <button class="btn-download" onclick="location.href='/api/download-zip'">📦 이미지 ZIP 다운로드</button>
+                        </div>
                     </div>
+                    <p style="font-size:0.85rem; color:#8A6B73; margin-bottom:24px; text-align:center;">
+                        각 패널의 텍스트를 직접 수정할 수 있습니다. 수정 후 <strong>[수정된 대본 저장]</strong>을 눌러 JSON 파일로 내보내세요.
+                    </p>
                     <div id="image-grid" class="grid"></div>
                 </div>
             </div>
@@ -503,39 +509,70 @@ async def index():
                 setTimeout(() => t.style.opacity = '0', 2000);
             }
 
+            let panelTexts = [];
+
             async function uploadImage(input) {
                 if (!input.files[0]) return;
                 
                 const jsonText = document.getElementById('jsonInput').value.trim();
-                if (!jsonText) {
-                    alert("먼저 스토리 텍스트(JSON)를 붙여넣어 주세요!");
-                    input.value = '';
-                    return;
+                let scriptData = [];
+                if (jsonText) {
+                    try { scriptData = JSON.parse(jsonText); } catch(e) {}
                 }
 
                 document.getElementById('loading').style.display = 'flex';
-                document.getElementById('loadingText').innerText = "텍스트 합성 및 고화질 업스케일링 중...";
+                document.getElementById('loadingText').innerText = "1024px 고화질 분할 중...";
                 const formData = new FormData();
                 formData.append('file', input.files[0]);
-                formData.append('story_script', jsonText);
+                if (jsonText) formData.append('story_script', jsonText);
                 try {
                     const res = await fetch(`/api/slice?mode=${currentMode}`, { method: 'POST', body: formData });
                     if (!res.ok) throw new Error("서버 응답 오류");
                     const data = await res.json();
                     const grid = document.getElementById('image-grid');
                     grid.innerHTML = '';
-                    data.images.forEach(img => {
-                        grid.innerHTML += `
-                            <div class="page-card">
-                                <img src="${img.data}">
-                                <div class="page-info">SCENE ${img.index}</div>
+                    panelTexts = [];
+
+                    data.images.forEach((img, i) => {
+                        const text = scriptData[i] || '';
+                        panelTexts.push(text);
+
+                        const card = document.createElement('div');
+                        card.className = 'page-card';
+                        card.style.cssText = 'display:flex; flex-direction:column; gap:0; overflow:hidden; border-radius:16px; border:1px solid var(--border); background:var(--surface);';
+                        card.innerHTML = `
+                            <div style="position:relative;">
+                                <img src="${img.data}" style="width:100%; display:block; border-radius:16px 16px 0 0;">
+                                <div style="position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.55); color:#fff; font-size:0.75rem; font-weight:700; padding:4px 10px; border-radius:20px;">SCENE ${img.index}</div>
+                            </div>
+                            <div style="padding:14px;">
+                                <label style="font-size:0.75rem; font-weight:700; color:var(--primary); display:block; margin-bottom:6px;">📝 대본 텍스트</label>
+                                <textarea id="panel-text-${i}" rows="3" oninput="panelTexts[${i}]=this.value" style="width:100%; box-sizing:border-box; resize:vertical; border-radius:10px; border:1px solid var(--border); padding:10px; font-size:0.85rem; font-family:inherit; line-height:1.5; background:var(--bg);">${text}</textarea>
                             </div>
                         `;
+                        grid.appendChild(card);
                     });
+
                     document.getElementById('results-area').style.display = 'block';
                     document.getElementById('results-area').scrollIntoView({ behavior: 'smooth' });
                 } catch (err) { alert('오류: ' + err.message); }
                 finally { document.getElementById('loading').style.display = 'none'; input.value = ''; }
+            }
+
+            function downloadScript() {
+                // 현재 textarea 내용을 최신으로 동기화
+                document.querySelectorAll('[id^="panel-text-"]').forEach((el, i) => {
+                    panelTexts[i] = el.value;
+                });
+                const json = JSON.stringify(panelTexts, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'story_script_edited.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('수정된 대본이 저장되었습니다!');
             }
 
             // Init
