@@ -76,16 +76,15 @@ ABSOLUTE RULES (CRITICAL)
 - Original character designs only — no copyrighted references (e.g., Disney, Pixar).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ART STYLE (match these reference examples exactly)
+ART STYLE (CRITICAL 'DNA' OF THE IMAGE)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Style name: semi-flat 2D cartoon illustration (modern educational animation style)
-- Characters: flat-colored bodies with ONLY subtle inner shading — NO full 3D rendering
-- Outlines: thick, clean, dark outlines on ALL characters and major objects
-- Character shape: chubby, round-faced, big-eyed chibi/cute proportions
-- Colors: highly saturated pastel palette — clear, vivid, warm, and cheerful tones
-- Backgrounds: layered depth with warm gradients and soft textures (wood grain, grass, stone — backgrounds have MORE detail than characters)
-- Lighting: soft directional light from one consistent source per panel, with gentle drop shadows beneath characters
-- STRICTLY BAN: NO photorealism, NO watercolor, NO pencil texture, NO Disney/Pixar 3D look, NO highly detailed digital painting
+- Overall Vibe: Calm, innocent, modern educational children's book illustration.
+- Line Art: Soft brown or dark colored outlines (NOT harsh black), consistent line weight, mostly on outer edges.
+- Shading & Texture: 95% flat solid colors. Use ONLY very soft, minimal drop shadows for depth. NO glossy 3D highlights. NO cinematic lighting. NO gradients on characters. 
+- Characters: Simple dots for eyes, simple curved lines for mouths, soft pink oval flushed cheeks. Soft, rounded, simple anatomy. "Paper doll" or "felt cutout" aesthetic.
+- Colors: Warm, muted earthy pastels (terracotta, soft greens, faded blues, warm wood tones). DO NOT use aggressively saturated neon colors.
+- Backgrounds: Simple flat geometric shapes layered to create depth. Trees are simple blobs, clouds are simple scallops. No hyper-realistic details.
+- STRICTLY BAN: NO 3D rendering, NO Disney/Pixar style, NO photorealism, NO watercolor, NO anime style.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CHARACTER DESIGN (keep consistent across ALL 16 panels)
