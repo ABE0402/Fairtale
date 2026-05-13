@@ -5,9 +5,10 @@ import zipfile
 import json
 import tempfile
 from io import BytesIO
-from fastapi import FastAPI, UploadFile, File, HTTPException, Query, Body
+from fastapi import FastAPI, UploadFile, File, HTTPException, Query, Body, Form
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageDraw, ImageFont
+import textwrap
 
 app = FastAPI(title="AI Fairytale Studio")
 
@@ -29,9 +30,8 @@ USER INPUT:
 
 The AI must automatically:
 - generate the full story structure
-- divide the story into 16 important scenes
-- create narration text for each scene
-- insert the narration text directly into the image
+- divide the story into exactly 16 important scenes
+- KEEP IMAGES 100% CLEAN: ABSOLUTELY NO TEXT, NO SPEECH BUBBLES, NO LETTERS in the image panels.
 - keep consistent character designs across all panels
 - adjust the English difficulty based on the selected English Level
 
@@ -58,33 +58,28 @@ If English Level is "Elementary School Upper Grades (4–6)":
 STYLE:
 Flat vector illustration style, clean and organized pastel color palette, 2D storybook art, simple and neat shapes, no heavy 3D shading, cute and expressive characters, warm and cozy atmosphere, clean outlines, minimalistic and highly readable composition, family-friendly children's book illustration.
 
-LAYOUT:
+LAYOUT & NO TEXT RULE:
 - Multi-panel comic storybook layout
-- Exactly 16 story panels
-- Arrange the panels in a perfectly balanced 4x4 comic grid
+- Exactly 16 story panels arranged in a perfectly balanced 4x4 comic grid
 - All 16 panels must have the same size and proportions
 - Keep equal spacing between all panels
-- Maintain consistent panel dimensions across the entire page
-- Avoid oversized or undersized panels
-- Avoid overlapping text between panels
-- Keep all narration fully visible inside each panel
+- DO NOT DRAW ANY TEXT OR SPEECH BUBBLES inside the panels. The artwork must be completely clean.
 - Each panel must show one important moment from the story
-- Add English narration text inside every panel
-- Use large readable children's storybook font
-- Use black outlined text for readability
-- Cinematic storytelling composition
 - Bright colorful fantasy backgrounds
 - Cute facial expressions and dynamic character poses
 - Keep visual pacing balanced from beginning to ending
 
-STORY GENERATION RULES:
-- Automatically create a simplified children's version of the story
-- Maintain a clear beginning, middle, climax, and ending
-- Carefully adapt the pacing of the story so that it spans exactly 16 panels, giving each panel a distinct action or moment.
-- Focus on emotional and visually important scenes
-- Each panel should contain different actions and environments
-- The narration text should match the selected English Level
-- Keep the story family-friendly and emotionally warm
+TEXT OUTPUT RULE (CRITICAL):
+After generating the clean 16-panel image, you MUST provide the English narration text for all 16 panels in a JSON array format. Do NOT put text in the image. Put it here:
+```json
+[
+  "Text for panel 1...",
+  "Text for panel 2...",
+  "Text for panel 3...",
+  ...
+  "Text for panel 16..."
+]
+```
 
 VISUAL STYLE:
 flat vector art, 2D children's book illustration, crisp and clean shapes, pastel tones, cozy atmosphere, adorable characters, simple flat shading, children's comic book illustration"""
@@ -126,9 +121,10 @@ async def build_prompt(data: dict = Body(...)):
 @app.post("/api/slice")
 async def slice_comic(
     file: UploadFile = File(...), 
+    story_script: str = Form(None),
     mode: int = Query(1, description="1: 싱글, 2: 2장 펼침, 3: 3장 펼침")
 ):
-    """스마트 크롭 + 1024px 고화질 업스케일 적용"""
+    """스마트 크롭 + 1024px 고화질 업스케일 + 텍스트 오버레이 자동 적용"""
     # Vercel 환경에서는 파일 시스템이 휘발성이므로 임시 경로 사용
     temp_filename = os.path.join(UPLOAD_DIR, file.filename)
     with open(temp_filename, "wb") as buffer:
@@ -169,6 +165,45 @@ async def slice_comic(
                 # ✨ HQ Upscale (LANCZOS)
                 cell = cell.resize((1024, 1024), Image.Resampling.LANCZOS)
                 all_cells.append(cell)
+
+        # 텍스트 스크립트 파싱
+        script_list = []
+        if story_script:
+            try:
+                script_list = json.loads(story_script)
+            except:
+                pass
+
+        # 폰트 설정
+        font_path = os.path.join(os.getcwd(), "fonts", "Sniglet-Regular.ttf")
+        try:
+            font = ImageFont.truetype(font_path, 42)
+        except IOError:
+            font = ImageFont.load_default()
+
+        # 텍스트 오버레이 합성
+        for i, cell in enumerate(all_cells):
+            if i < len(script_list):
+                text = script_list[i]
+                draw = ImageDraw.Draw(cell, "RGBA")
+                
+                # 줄바꿈 처리
+                lines = textwrap.wrap(text, width=45)
+                line_height = 55
+                text_block_height = len(lines) * line_height
+                
+                # 반투명 배경 박스
+                box_top = 1024 - text_block_height - 60
+                draw.rectangle([(0, box_top), (1024, 1024)], fill=(0, 0, 0, 160))
+                
+                # 텍스트 그리기
+                y_text = box_top + 30
+                for line in lines:
+                    bbox = draw.textbbox((0, 0), line, font=font)
+                    w = bbox[2] - bbox[0]
+                    x_text = (1024 - w) / 2
+                    draw.text((x_text, y_text), line, font=font, fill=(255, 255, 255, 255))
+                    y_text += line_height
 
         # 4. 레이아웃 모드 적용
         result_data = []
@@ -366,8 +401,16 @@ async def index():
                 <div class="step-card">
                     <div class="step-header">
                         <div class="step-num">2</div>
-                        <h2 class="step-title">이미지 업로드 및 고화질 분할</h2>
+                        <h2 class="step-title">스토리 대본 및 이미지 업로드</h2>
                     </div>
+                    <div class="input-group">
+                        <label class="input-label" style="display:flex; justify-content:space-between;">
+                            <span>📝 GPT가 생성한 스토리 텍스트 (JSON)</span>
+                            <span style="font-size: 0.8rem; font-weight:normal; color:#8A6B73;">복사해서 그대로 붙여넣어 주세요</span>
+                        </label>
+                        <textarea id="jsonInput" placeholder='[\n  "Once upon a time...",\n  "..."\n]' style="width:100%; height:120px; border-radius:12px; border:1px solid var(--border); padding:15px; font-family:monospace; resize:vertical; margin-bottom:15px;"></textarea>
+                    </div>
+                    
                     <div class="mode-selector">
                         <button class="mode-btn active" onclick="setMode(1, this)">📄 낱장 (16장)</button>
                         <button class="mode-btn" onclick="setMode(2, this)">📖 2장 펼침</button>
@@ -376,7 +419,7 @@ async def index():
                     <div class="upload-area" onclick="document.getElementById('fileInput').click()">
                         <div class="upload-icon">🖼️</div>
                         <h3>생성된 16칸 이미지를 선택하세요</h3>
-                        <p>자동으로 1024px 고화질 분할이 시작됩니다</p>
+                        <p>자동으로 텍스트 합성 및 고화질 분할이 시작됩니다</p>
                         <input type="file" id="fileInput" style="display:none" accept="image/*" onchange="uploadImage(this)">
                     </div>
                 </div>
@@ -465,9 +508,19 @@ async def index():
 
             async function uploadImage(input) {
                 if (!input.files[0]) return;
+                
+                const jsonText = document.getElementById('jsonInput').value.trim();
+                if (!jsonText) {
+                    alert("먼저 스토리 텍스트(JSON)를 붙여넣어 주세요!");
+                    input.value = '';
+                    return;
+                }
+
                 document.getElementById('loading').style.display = 'flex';
+                document.getElementById('loadingText').innerText = "텍스트 합성 및 고화질 업스케일링 중...";
                 const formData = new FormData();
                 formData.append('file', input.files[0]);
+                formData.append('story_script', jsonText);
                 try {
                     const res = await fetch(`/api/slice?mode=${currentMode}`, { method: 'POST', body: formData });
                     if (!res.ok) throw new Error("서버 응답 오류");
