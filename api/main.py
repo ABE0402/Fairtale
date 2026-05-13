@@ -22,36 +22,19 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ── 프롬프트 템플릿 ────────────────────────────────────────────────────────────
-PROMPT_TEMPLATE = """Create a colorful children's fairytale comic storybook illustration based on the fairy tale title provided by the user.
+SCRIPT_PROMPT_TEMPLATE = """Create a children's fairytale story script based on the following:
 
-USER INPUT:
 - Title: {title}
 - English Level: {level}
 
-CRITICAL WORKFLOW (YOU MUST FOLLOW THIS EXACT ORDER):
-STEP 1: FIRST, output the narration text for all 16 scenes in a JSON array format.
-STEP 2: SECOND, generate the 16-panel comic image based on the scenes.
-
-TEXT OUTPUT RULE (FOR STEP 1):
-Before generating any image, output a code block containing the English narration text for all 16 panels in a JSON array format like this:
-```json
-[
-  "Text for panel 1...",
-  "Text for panel 2...",
-  ...
-  "Text for panel 16..."
-]
-```
-
-The AI must automatically:
-- generate the full story structure
-- divide the story into exactly 16 important scenes
-- KEEP IMAGES 100% CLEAN: ABSOLUTELY NO TEXT, NO SPEECH BUBBLES, NO LETTERS in the image panels.
-- keep consistent character designs across all panels
-- adjust the English difficulty based on the selected English Level
+RULES:
+- Automatically create a simplified children's version of the story.
+- Maintain a clear beginning, middle, climax, and ending.
+- Divide the story into EXACTLY 16 important scenes.
+- The narration text should match the selected English Level.
+- Keep the story family-friendly and emotionally warm.
 
 ENGLISH LEVEL RULES:
-
 If English Level is "Kindergarten":
 - Limit narration to 1-2 very short sentences per panel (under 10 words).
 - Heavily use fun sound words and onomatopoeia (e.g., "Chop, chop!", "Splash!", "Poof!").
@@ -62,27 +45,35 @@ If English Level is "Elementary School Lower Grades (1–3)":
 - Use 1-3 short, natural sentences per panel (10-15 words).
 - Include simple dialogue mixed with basic narrative descriptions.
 - Use beginner-level storytelling vocabulary.
-- Keep the story flow clear and easy to follow.
 
 If English Level is "Elementary School Upper Grades (4–6)":
 - Use 2-4 longer, descriptive sentences per panel (15-25 words).
 - Include rich dialogue, emotional expressions, and detailed character actions.
 - Use advanced storytelling vocabulary (e.g., "pretended", "disappeared", "greedy").
-- Allow for more complex grammatical structures.
 
-STYLE:
-Flat vector illustration style, clean and organized pastel color palette, 2D storybook art, simple and neat shapes, no heavy 3D shading, cute and expressive characters, warm and cozy atmosphere, clean outlines, minimalistic and highly readable composition, family-friendly children's book illustration.
+OUTPUT FORMAT (JSON ONLY):
+You MUST output the final 16 scenes as a JSON array of strings. Do not output anything else.
+```json
+[
+  "Text for scene 1...",
+  "Text for scene 2...",
+  ...
+  "Text for scene 16..."
+]
+```
+"""
 
-LAYOUT & NO TEXT RULE:
-- Multi-panel comic storybook layout
-- Exactly 16 story panels arranged in a perfectly balanced 4x4 comic grid
-- All 16 panels must have the same size and proportions
-- Keep equal spacing between all panels
-- DO NOT DRAW ANY TEXT OR SPEECH BUBBLES inside the panels. The artwork must be completely clean.
-- Each panel must show one important moment from the story
-- Bright colorful fantasy backgrounds
-- Cute facial expressions and dynamic character poses
-- Keep visual pacing balanced from beginning to ending
+IMAGE_PROMPT_TEMPLATE = """Create a colorful children's fairytale comic storybook illustration based on the title: {title}
+
+The AI must automatically generate a 16-panel comic grid depicting the entire story.
+
+LAYOUT & NO TEXT RULE (CRITICAL):
+- Multi-panel comic storybook layout.
+- Exactly 16 story panels arranged in a perfectly balanced 4x4 comic grid.
+- All 16 panels must have the same size and proportions.
+- KEEP IMAGES 100% CLEAN: ABSOLUTELY NO TEXT, NO SPEECH BUBBLES, NO LETTERS in the image panels.
+- Each panel must show one important moment from the story sequentially.
+- keep consistent character designs across all panels.
 
 VISUAL STYLE:
 Keep it simple and similar to a 2D cartoon, flat vector art, 2D children's book illustration, crisp and clean shapes, A palette of soft pastels, warm earthy tones, and bright cheerful accents, cozy atmosphere, adorable characters, simple flat shading, children's comic book illustration"""
@@ -118,8 +109,9 @@ def merge_images(image_list):
 async def build_prompt(data: dict = Body(...)):
     title = data.get("title", "Unknown Title")
     level = data.get("level", "Kindergarten")
-    prompt = PROMPT_TEMPLATE.format(title=title, level=level)
-    return {"prompt": prompt}
+    script_prompt = SCRIPT_PROMPT_TEMPLATE.format(title=title, level=level)
+    image_prompt = IMAGE_PROMPT_TEMPLATE.format(title=title)
+    return {"script_prompt": script_prompt, "image_prompt": image_prompt}
 
 @app.post("/api/slice")
 async def slice_comic(
@@ -393,10 +385,24 @@ async def index():
                             <div class="level-opt" onclick="setLevel('Elementary School Upper Grades (4–6)', this)">초등 고학년</div>
                         </div>
                     </div>
-                    <div class="prompt-box" id="promptDisplay">프롬프트가 이곳에 생성됩니다...</div>
-                    <button class="btn-copy" onclick="copyPrompt()">✨ 매직 프롬프트 복사하기</button>
-                    <p style="font-size: 0.85rem; color: #8A6B73; text-align: center; margin-top: 15px;">
-                        복사한 프롬프트를 <a href="https://chatgpt.com" target="_blank" style="color: var(--primary); font-weight: bold;">ChatGPT 웹사이트</a>에 붙여넣어 16칸 이미지를 생성하세요!
+                    
+                    <div style="display: flex; gap: 20px; margin-top: 20px;">
+                        <div style="flex: 1; display: flex; flex-direction: column;">
+                            <label class="input-label">📝 1. 대본 생성 프롬프트</label>
+                            <div class="prompt-box" id="scriptPromptDisplay" style="flex: 1; height: 120px; overflow-y: auto;">프롬프트가 생성됩니다...</div>
+                            <button class="btn-copy" style="margin-top: 10px; background: var(--primary);" onclick="copyScriptPrompt()">✨ 대본 프롬프트 복사</button>
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column;">
+                            <label class="input-label">🎨 2. 그림 생성 프롬프트</label>
+                            <div class="prompt-box" id="imagePromptDisplay" style="flex: 1; height: 120px; overflow-y: auto;">프롬프트가 생성됩니다...</div>
+                            <button class="btn-copy" style="margin-top: 10px;" onclick="copyImagePrompt()">✨ 그림 프롬프트 복사</button>
+                        </div>
+                    </div>
+                    
+                    <p style="font-size: 0.85rem; color: #8A6B73; text-align: center; margin-top: 25px; line-height: 1.5;">
+                        <strong style="color:var(--text);">사용 방법:</strong><br>
+                        1. <strong>대본 프롬프트</strong>를 <a href="https://chatgpt.com" target="_blank" style="color: var(--primary); font-weight: bold;">ChatGPT</a>에 복사하여 <strong>16줄 JSON 텍스트</strong>를 얻으세요.<br>
+                        2. <strong>그림 프롬프트</strong>를 복사하여 <strong>글씨 없는 16칸 깨끗한 이미지</strong>를 얻으세요.
                     </p>
                 </div>
 
@@ -448,7 +454,8 @@ async def index():
         <script>
             let currentLevel = 'Kindergarten';
             let currentMode = 1;
-            let currentPrompt = "";
+            let currentScriptPrompt = "";
+            let currentImagePrompt = "";
 
             async function updatePrompt() {
                 const titleInput = document.getElementById('titleInput');
@@ -464,10 +471,11 @@ async def index():
                     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                     
                     const data = await res.json();
-                    currentPrompt = data.prompt;
+                    currentScriptPrompt = data.script_prompt;
+                    currentImagePrompt = data.image_prompt;
                     
-                    const display = document.getElementById('promptDisplay');
-                    display.innerText = currentPrompt;
+                    document.getElementById('scriptPromptDisplay').innerText = currentScriptPrompt;
+                    document.getElementById('imagePromptDisplay').innerText = currentImagePrompt;
                 } catch (err) {
                     console.error("Failed to update prompt:", err);
                 }
@@ -486,20 +494,24 @@ async def index():
                 btn.classList.add('active');
             }
 
-            function copyPrompt() {
+            function copyScriptPrompt() {
                 const title = document.getElementById('titleInput').value.trim();
                 if (!title) { alert("동화 제목을 먼저 입력해주세요!"); return; }
+                if (!currentScriptPrompt) return;
                 
-                if (!currentPrompt || currentPrompt.includes("[제목 입력]")) {
-                    alert("프롬프트가 아직 생성되지 않았습니다.");
-                    return;
-                }
+                navigator.clipboard.writeText(currentScriptPrompt).then(() => {
+                    showToast("대본 프롬프트가 복사되었습니다!");
+                }).catch(err => alert("복사 실패: " + err));
+            }
+
+            function copyImagePrompt() {
+                const title = document.getElementById('titleInput').value.trim();
+                if (!title) { alert("동화 제목을 먼저 입력해주세요!"); return; }
+                if (!currentImagePrompt) return;
                 
-                navigator.clipboard.writeText(currentPrompt).then(() => {
-                    showToast("프롬프트가 복사되었습니다!");
-                }).catch(err => {
-                    alert("복사 실패: " + err);
-                });
+                navigator.clipboard.writeText(currentImagePrompt).then(() => {
+                    showToast("그림 프롬프트가 복사되었습니다!");
+                }).catch(err => alert("복사 실패: " + err));
             }
 
             function showToast(msg) {
