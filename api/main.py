@@ -75,6 +75,11 @@ LAYOUT & NO TEXT RULE (CRITICAL):
 - Each panel must show one important moment from the story sequentially.
 - keep consistent character designs across all panels.
 
+SAFETY & COPYRIGHT RULES (CRITICAL):
+- DO NOT use any copyrighted character designs, outfits, or specific art styles (e.g., Disney, Pixar).
+- ALL characters MUST be completely original and generic.
+- If the title implies a classic fairy tale, create a completely original interpretation of the characters and settings to strictly avoid copyright infringement.
+
 VISUAL STYLE:
 Keep it simple and similar to a 2D cartoon, flat vector art, 2D children's book illustration, crisp and clean shapes, A palette of soft pastels, warm earthy tones, and bright cheerful accents, cozy atmosphere, adorable characters, simple flat shading, children's comic book illustration"""
 
