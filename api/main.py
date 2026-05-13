@@ -67,10 +67,11 @@ IMAGE_PROMPT_TEMPLATE = """Create a colorful children's fairytale comic storyboo
 
 The AI must automatically generate a 16-panel comic grid depicting the entire story.
 
-LAYOUT & NO TEXT RULE (CRITICAL):
-- Multi-panel comic storybook layout.
-- Exactly 16 story panels arranged in a perfectly balanced 4x4 comic grid.
-- All 16 panels must have the same size and proportions.
+LAYOUT & NO TEXT RULE (CRITICAL - DO NOT IGNORE):
+- You MUST draw EXACTLY a 4x4 grid layout.
+- 4 equal rows and 4 equal columns. Exactly 16 equal-sized square panels.
+- Do NOT draw 3x3 or irregular shapes. It MUST be a perfect 4x4 grid.
+- All 16 panels must have the exact same size and proportions.
 - KEEP IMAGES 100% CLEAN: ABSOLUTELY NO TEXT, NO SPEECH BUBBLES, NO LETTERS in the image panels.
 - Each panel must show one important moment from the story sequentially.
 - keep consistent character designs across all panels.
@@ -172,44 +173,11 @@ async def slice_comic(
                 cell = cell.resize((1024, 1024), Image.Resampling.LANCZOS)
                 all_cells.append(cell)
 
-        # 텍스트 스크립트 파싱
-        script_list = []
+        # 텍스트 대본 별도 파일로 저장 (ZIP에 포함됨)
         if story_script:
-            try:
-                script_list = json.loads(story_script)
-            except:
-                pass
-
-        # 폰트 설정
-        font_path = os.path.join(os.getcwd(), "fonts", "Sniglet-Regular.ttf")
-        try:
-            font = ImageFont.truetype(font_path, 42)
-        except IOError:
-            font = ImageFont.load_default()
-
-        # 텍스트 오버레이 합성
-        for i, cell in enumerate(all_cells):
-            if i < len(script_list):
-                text = script_list[i]
-                draw = ImageDraw.Draw(cell, "RGBA")
-                
-                # 줄바꿈 처리
-                lines = textwrap.wrap(text, width=45)
-                line_height = 55
-                text_block_height = len(lines) * line_height
-                
-                # 반투명 배경 박스
-                box_top = 1024 - text_block_height - 60
-                draw.rectangle([(0, box_top), (1024, 1024)], fill=(0, 0, 0, 160))
-                
-                # 텍스트 그리기
-                y_text = box_top + 30
-                for line in lines:
-                    bbox = draw.textbbox((0, 0), line, font=font)
-                    w = bbox[2] - bbox[0]
-                    x_text = (1024 - w) / 2
-                    draw.text((x_text, y_text), line, font=font, fill=(255, 255, 255, 255))
-                    y_text += line_height
+            script_path = os.path.join(OUTPUT_DIR, "story_script.json")
+            with open(script_path, "w", encoding="utf-8") as f:
+                f.write(story_script)
 
         # 4. 레이아웃 모드 적용
         result_data = []
