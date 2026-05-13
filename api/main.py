@@ -85,7 +85,7 @@ LAYOUT & NO TEXT RULE:
 - Keep visual pacing balanced from beginning to ending
 
 VISUAL STYLE:
-flat vector art, 2D children's book illustration, crisp and clean shapes, pastel tones, cozy atmosphere, adorable characters, simple flat shading, children's comic book illustration"""
+Keep it simple and similar to a 2D cartoon, flat vector art, 2D children's book illustration, crisp and clean shapes, pastel tones, cozy atmosphere, adorable characters, simple flat shading, children's comic book illustration"""
 
 # ── 이미지 처리 유틸리티 ────────────────────────────────────────────────────────
 
