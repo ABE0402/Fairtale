@@ -56,7 +56,7 @@ If English Level is "Elementary School Upper Grades (4–6)":
 - Allow for more complex grammatical structures.
 
 STYLE:
-Cute cartoon style, Disney-inspired children's book illustration, warm pastel colors, whimsical fantasy atmosphere, soft lighting, clean outlines, highly detailed, emotional storytelling, family-friendly, polished digital painting.
+Flat vector illustration style, clean and organized pastel color palette, 2D storybook art, simple and neat shapes, no heavy 3D shading, cute and expressive characters, warm and cozy atmosphere, clean outlines, minimalistic and highly readable composition, family-friendly children's book illustration.
 
 LAYOUT:
 - Multi-panel comic storybook layout
@@ -87,7 +87,7 @@ STORY GENERATION RULES:
 - Keep the story family-friendly and emotionally warm
 
 VISUAL STYLE:
-storybook illustration, animated movie style, magical fairytale world, cozy atmosphere, adorable characters, cinematic lighting, children's comic book illustration"""
+flat vector art, 2D children's book illustration, crisp and clean shapes, pastel tones, cozy atmosphere, adorable characters, simple flat shading, children's comic book illustration"""
 
 # ── 이미지 처리 유틸리티 ────────────────────────────────────────────────────────
 
