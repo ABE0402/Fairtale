@@ -38,19 +38,22 @@ The AI must automatically:
 ENGLISH LEVEL RULES:
 
 If English Level is "Kindergarten":
-- Use very short and simple sentences
-- Use easy everyday vocabulary
-- Keep narration extremely simple and repetitive
+- Limit narration to 1-2 very short sentences per panel (under 10 words).
+- Heavily use fun sound words and onomatopoeia (e.g., "Chop, chop!", "Splash!", "Poof!").
+- Use extremely simple, repetitive everyday vocabulary.
+- Keep dialogues very short and repetitive (e.g., "No, no!", "Yes, yes!").
 
 If English Level is "Elementary School Lower Grades (1–3)":
-- Use short natural sentences
-- Use beginner-level storytelling vocabulary
-- Keep narration clear and easy to read
+- Use 1-3 short, natural sentences per panel (10-15 words).
+- Include simple dialogue mixed with basic narrative descriptions.
+- Use beginner-level storytelling vocabulary.
+- Keep the story flow clear and easy to follow.
 
 If English Level is "Elementary School Upper Grades (4–6)":
-- Use longer descriptive sentences
-- Use richer storytelling vocabulary
-- Allow slightly more emotional and detailed narration
+- Use 2-4 longer, descriptive sentences per panel (15-25 words).
+- Include rich dialogue, emotional expressions, and detailed character actions.
+- Use advanced storytelling vocabulary (e.g., "pretended", "disappeared", "greedy").
+- Allow for more complex grammatical structures.
 
 STYLE:
 Cute cartoon style, Disney-inspired children's book illustration, warm pastel colors, whimsical fantasy atmosphere, soft lighting, clean outlines, highly detailed, emotional storytelling, family-friendly, polished digital painting.
@@ -77,6 +80,7 @@ LAYOUT:
 STORY GENERATION RULES:
 - Automatically create a simplified children's version of the story
 - Maintain a clear beginning, middle, climax, and ending
+- Carefully adapt the pacing of the story so that it spans exactly 16 panels, giving each panel a distinct action or moment.
 - Focus on emotional and visually important scenes
 - Each panel should contain different actions and environments
 - The narration text should match the selected English Level
