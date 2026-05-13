@@ -63,32 +63,36 @@ You MUST output the final 16 scenes as a JSON array of strings. Do not output an
 ```
 """
 
-IMAGE_PROMPT_TEMPLATE = """Create a colorful children's fairytale comic storybook illustration based on the title: {title}
+IMAGE_PROMPT_TEMPLATE = """Create a children's fairytale storybook illustration based on the title: {title}
 
-The AI must automatically generate a 16-panel comic grid depicting the entire story.
-
-LAYOUT & NO TEXT RULE (CRITICAL - DO NOT IGNORE):
-- You MUST draw EXACTLY a 4x4 grid layout.
-- 4 equal rows and 4 equal columns. Exactly 16 equal-sized square panels.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ABSOLUTE RULES (CRITICAL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- ZERO text, letters, numbers, captions, or speech bubbles anywhere in the image. The images MUST be 100% clean.
+- Generate a single image with EXACTLY 16 panels arranged in a perfectly balanced 4x4 grid (4 rows, 4 columns).
 - Do NOT draw 3x3 or irregular shapes. It MUST be a perfect 4x4 grid.
-- All 16 panels must have the exact same size and proportions.
-- KEEP IMAGES 100% CLEAN: ABSOLUTELY NO TEXT, NO SPEECH BUBBLES, NO LETTERS in the image panels.
+- All 16 panels must be exactly the same size and proportions, separated by thin white lines.
 - Each panel must show one important moment from the story sequentially.
-- keep consistent character designs across all panels.
+- Original character designs only — no copyrighted references (e.g., Disney, Pixar).
 
-SAFETY & COPYRIGHT RULES (CRITICAL):
-- DO NOT use any copyrighted character designs, outfits, or specific art styles (e.g., Disney, Pixar).
-- ALL characters MUST be completely original and generic.
-- If the title implies a classic fairy tale, create a completely original interpretation of the characters and settings to strictly avoid copyright infringement.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ART STYLE (match these reference examples exactly)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Style name: semi-flat 2D cartoon illustration (modern educational animation style)
+- Characters: flat-colored bodies with ONLY subtle inner shading — NO full 3D rendering
+- Outlines: thick, clean, dark outlines on ALL characters and major objects
+- Character shape: chubby, round-faced, big-eyed chibi/cute proportions
+- Colors: highly saturated pastel palette — clear, vivid, warm, and cheerful tones
+- Backgrounds: layered depth with warm gradients and soft textures (wood grain, grass, stone — backgrounds have MORE detail than characters)
+- Lighting: soft directional light from one consistent source per panel, with gentle drop shadows beneath characters
+- STRICTLY BAN: NO photorealism, NO watercolor, NO pencil texture, NO Disney/Pixar 3D look, NO highly detailed digital painting
 
-STRICT ART DIRECTION:
-- The art style MUST be a very simple, completely flat 2D vector illustration (like a modern educational children's book).
-- STRICTLY BAN: No 3D rendering, no Disney-style, no cinematic lighting, no realistic shading, no gradients, no detailed digital painting.
-- Use only solid flat colors, simple clean outlines, and minimal to no shading.
-- Characters should look like simple, cute educational vector graphics.
-
-VISUAL STYLE KEYWORDS:
-completely flat vector art, 2D minimalist children's educational book illustration, crisp vector shapes, solid pastel colors, cute modern cartoon style, 100% flat shading, no 3D."""
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHARACTER DESIGN (keep consistent across ALL 16 panels)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Create specific, recognizable original character designs for the main characters of the story: {title}.
+- Keep their clothing, hairstyles, colors, and facial features 100% consistent across all 16 panels.
+- Ensure the character designs match the cultural setting of the story if applicable."""
 
 # ── 이미지 처리 유틸리티 ────────────────────────────────────────────────────────
 
