@@ -28,6 +28,21 @@ USER INPUT:
 - Title: {title}
 - English Level: {level}
 
+CRITICAL WORKFLOW (YOU MUST FOLLOW THIS EXACT ORDER):
+STEP 1: FIRST, output the narration text for all 16 scenes in a JSON array format.
+STEP 2: SECOND, generate the 16-panel comic image based on the scenes.
+
+TEXT OUTPUT RULE (FOR STEP 1):
+Before generating any image, output a code block containing the English narration text for all 16 panels in a JSON array format like this:
+```json
+[
+  "Text for panel 1...",
+  "Text for panel 2...",
+  ...
+  "Text for panel 16..."
+]
+```
+
 The AI must automatically:
 - generate the full story structure
 - divide the story into exactly 16 important scenes
@@ -68,18 +83,6 @@ LAYOUT & NO TEXT RULE:
 - Bright colorful fantasy backgrounds
 - Cute facial expressions and dynamic character poses
 - Keep visual pacing balanced from beginning to ending
-
-TEXT OUTPUT RULE (CRITICAL):
-After generating the clean 16-panel image, you MUST provide the English narration text for all 16 panels in a JSON array format. Do NOT put text in the image. Put it here:
-```json
-[
-  "Text for panel 1...",
-  "Text for panel 2...",
-  "Text for panel 3...",
-  ...
-  "Text for panel 16..."
-]
-```
 
 VISUAL STYLE:
 flat vector art, 2D children's book illustration, crisp and clean shapes, pastel tones, cozy atmosphere, adorable characters, simple flat shading, children's comic book illustration"""
