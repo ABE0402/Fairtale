@@ -80,8 +80,14 @@ SAFETY & COPYRIGHT RULES (CRITICAL):
 - ALL characters MUST be completely original and generic.
 - If the title implies a classic fairy tale, create a completely original interpretation of the characters and settings to strictly avoid copyright infringement.
 
-VISUAL STYLE:
-Keep it simple and similar to a 2D cartoon, flat vector art, 2D children's book illustration, crisp and clean shapes, A palette of soft pastels, warm earthy tones, and bright cheerful accents, cozy atmosphere, adorable characters, simple flat shading, children's comic book illustration"""
+STRICT ART DIRECTION:
+- The art style MUST be a very simple, completely flat 2D vector illustration (like a modern educational children's book).
+- STRICTLY BAN: No 3D rendering, no Disney-style, no cinematic lighting, no realistic shading, no gradients, no detailed digital painting.
+- Use only solid flat colors, simple clean outlines, and minimal to no shading.
+- Characters should look like simple, cute educational vector graphics.
+
+VISUAL STYLE KEYWORDS:
+completely flat vector art, 2D minimalist children's educational book illustration, crisp vector shapes, solid pastel colors, cute modern cartoon style, 100% flat shading, no 3D."""
 
 # ── 이미지 처리 유틸리티 ────────────────────────────────────────────────────────
 
