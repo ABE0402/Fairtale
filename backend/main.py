@@ -6,7 +6,7 @@ import json
 from io import BytesIO
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query, Body
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageEnhance
 
 app = FastAPI(title="AI Fairytale Studio")
 
@@ -34,22 +34,22 @@ The AI must automatically:
 ENGLISH LEVEL RULES:
 
 If English Level is "Kindergarten":
-- Use very short and simple sentences
+- STRICT RULE: Use exactly 1 short sentence per panel
+- Use very simple, rhythmic, and repetitive language
 - Use easy everyday vocabulary
-- Keep narration extremely simple and repetitive
 
 If English Level is "Elementary School Lower Grades (1–3)":
-- Use short natural sentences
+- STRICT RULE: Use 1 or 2 short natural sentences per panel
 - Use beginner-level storytelling vocabulary
 - Keep narration clear and easy to read
 
 If English Level is "Elementary School Upper Grades (4–6)":
-- Use longer descriptive sentences
+- STRICT RULE: Use 2 or 3 descriptive sentences per panel
 - Use richer storytelling vocabulary
-- Allow slightly more emotional and detailed narration
+- Allow more emotional and detailed narration
 
 STYLE:
-Cute cartoon style, Disney-inspired children's book illustration, warm pastel colors, whimsical fantasy atmosphere, soft lighting, clean outlines, highly detailed, emotional storytelling, family-friendly, polished digital painting.
+Cute cartoon style, Disney-inspired children's book illustration, Vibrant and highly saturated colors, vivid cinematic lighting with high contrast, sharp focus, borderless seamless panels, no frames, crystal clear details, 8k resolution textures, emotional storytelling, family-friendly, polished digital painting.
 
 LAYOUT:
 - Multi-panel comic storybook layout
@@ -79,7 +79,8 @@ STORY GENERATION RULES:
 - Keep the story family-friendly and emotionally warm
 
 VISUAL STYLE:
-storybook illustration, animated movie style, magical fairytale world, cozy atmosphere, adorable characters, cinematic lighting, children's comic book illustration"""
+storybook illustration, animated movie style, magical fairytale world, vibrant and clear atmosphere, adorable characters, vivid cinematic lighting, sharp children's comic book illustration, high contrast, no blurry filters
+"""
 
 # ── 이미지 처리 유틸리티 ────────────────────────────────────────────────────────
 
@@ -158,6 +159,20 @@ async def slice_comic(
                 
                 # ✨ HQ Upscale (LANCZOS)
                 cell = cell.resize((1024, 1024), Image.Resampling.LANCZOS)
+
+                # 🪄 AI-Style Post Processing (화질 및 색감 보정)
+                # 1. 선명도 강화 (Sharpness)
+                enhancer = ImageEnhance.Sharpness(cell)
+                cell = enhancer.enhance(1.8) # 1.8배 선명하게
+
+                # 2. 대비 강화 (Contrast) - 뿌연 느낌 제거
+                enhancer = ImageEnhance.Contrast(cell)
+                cell = enhancer.enhance(1.15) # 대비 15% 증가
+
+                # 3. 채도 강화 (Color) - 색감 생생하게
+                enhancer = ImageEnhance.Color(cell)
+                cell = enhancer.enhance(1.1) # 채도 10% 증가
+
                 all_cells.append(cell)
 
         # 4. 레이아웃 모드 적용

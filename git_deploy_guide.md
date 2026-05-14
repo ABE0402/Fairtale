@@ -33,6 +33,21 @@ git commit -m "feat: AI Fairytale Studio automation with Vercel support"
 git push origin feature/Automatic-fairytale
 ```
 
+## 4. 푸시 거절 시 대처법 (Troubleshooting)
+푸시 도중 `[rejected]` 에러가 발생한다면, 원격 저장소와 로컬의 내용이 다르기 때문입니다.
+
+### 방법 A: 강제 덮어쓰기 (추천)
+로컬에 있는 내용이 최신이고, 원격의 내용을 무시해도 될 때 사용합니다.
+```powershell
+git push origin feature/Automatic-fairytale --force
+```
+
+### 방법 B: 원격 내용 가져와서 합치기
+원격에 다른 사람이 올린 중요한 내용이 있을 때 사용합니다.
+```powershell
+git pull origin feature/Automatic-fairytale
+```
+
 ---
 **💡 팁**: 푸시할 때 GitHub 로그인 창이 뜨면 로그인해 주세요. 
 성공적으로 완료되면 Vercel에서 해당 브랜치를 연결하여 배포를 마무리할 수 있습니다.
