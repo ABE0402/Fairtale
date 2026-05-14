@@ -145,16 +145,19 @@ async def slice_comic(
 
         # 3. 정교하게 자르기 및 1024px 업스케일
         all_cells = []
-        # 테두리 여백 및 인접 패널 침범 방지를 위해 패딩 확대 (3%)
-        padding_w = cell_width * 0.03
-        padding_h = cell_height * 0.03
+        # 테두리 여백 및 인접 패널 침범 방지를 위해 패딩 확대 (5%)
+        padding_w = cell_width * 0.05
+        padding_h = cell_height * 0.05
+
+        # AI 이미지 특성상 상단에 미세한 여백/타이틀이 있을 수 있으므로 약간 하단으로 시프트 (1%)
+        top_offset = img_height * 0.01
 
         for r in range(rows):
             for c in range(cols):
                 left = c * cell_width + padding_w
-                top = r * cell_height + padding_h
+                top = r * cell_height + padding_h + top_offset
                 right = (c + 1) * cell_width - padding_w
-                bottom = (r + 1) * cell_height - padding_h
+                bottom = (r + 1) * cell_height - padding_h + top_offset
                 
                 cell = img.crop((left, top, right, bottom))
                 
