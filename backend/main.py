@@ -88,7 +88,8 @@ def trim_white_margins(img):
     """이미지 외곽의 하얀 여백을 자동으로 제거"""
     bg = Image.new(img.mode, img.size, (255, 255, 255))
     diff = ImageChops.difference(img, bg)
-    diff = ImageChops.add(diff, diff, 2.0, -100)
+    # 미세한 오프화이트(Off-white)도 감지할 수 있도록 임계값 조정
+    diff = ImageChops.add(diff, diff, 2.0, -50) 
     bbox = diff.getbbox()
     if bbox:
         return img.crop(bbox)
@@ -144,9 +145,9 @@ async def slice_comic(
 
         # 3. 정교하게 자르기 및 1024px 업스케일
         all_cells = []
-        # 테두리 여백을 살짝 남겨서 잘리는 부분 방지 (Padding 1%)
-        padding_w = cell_width * 0.01
-        padding_h = cell_height * 0.01
+        # 테두리 여백 및 인접 패널 침범 방지를 위해 패딩 확대 (3%)
+        padding_w = cell_width * 0.03
+        padding_h = cell_height * 0.03
 
         for r in range(rows):
             for c in range(cols):
