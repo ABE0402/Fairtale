@@ -13,8 +13,15 @@ import textwrap
 app = FastAPI(title="AI Fairytale Studio")
 
 # static 폴더 생성 및 마운트 (크레용스쿨 로고 등 정적 파일 지원)
-os.makedirs(os.path.join(os.getcwd(), "static", "img"), exist_ok=True)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+base_dir = os.path.dirname(os.path.abspath(__file__))
+parent_static = os.path.join(base_dir, "..", "static")
+local_static = os.path.join(base_dir, "static")
+
+if os.path.exists(parent_static):
+    app.mount("/static", StaticFiles(directory=parent_static), name="static")
+else:
+    os.makedirs(os.path.join(local_static, "img"), exist_ok=True)
+    app.mount("/static", StaticFiles(directory=local_static), name="static")
 
 # 폴더 설정
 UPLOAD_DIR = "uploads"
